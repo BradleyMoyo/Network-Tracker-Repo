@@ -1,0 +1,88 @@
+import random
+import string
+import secrets
+
+# Constants
+# NIST recommends machine-generated passwords to be 6 characters minimum
+MIN_PASSWORD_LENGTH = 6  # Minimum password length constant
+DEFAULT_PASSWORD_LENGTH = 12  # Default password length constant
+
+# Set Characters
+UPPERCASE = string.ascii_uppercase  # Uppercase letters
+LOWERCASE = string.ascii_lowercase  # Lowercase letters
+DIGITS = string.digits  # Digits (0-9)
+SPECIAL_CHARACTERS = string.punctuation  # Special characters (e.g., !, @, #, $)
+
+# Full character set
+ALL_CHARACTERS = UPPERCASE + LOWERCASE + DIGITS + SPECIAL_CHARACTERS  # Combined character set
+
+# Common List of Passwords according to Wikipedia
+COMMON_PASSWORDS = [
+    "123456", "123456789", "qwerty", "password", "1234567", "12345678", "12345",
+    "iloveyou", "111111", "123123", "abc123", "qwerty123", "1q2w3e4r", "admin",
+    "qwertyuiop", "654321", "555555", "lovely", "7777777", "welcome", "888888",
+    "princess", "dragon", "password1", "123qwe"
+]
+
+def generate_password(length=DEFAULT_PASSWORD_LENGTH):
+    # Check if the password length is less than the minimum allowed length
+    if length < MIN_PASSWORD_LENGTH:
+        raise ValueError(f"Password length must be at least {MIN_PASSWORD_LENGTH} characters")
+
+    # Loop until a valid password is generated
+    while True:
+        # Generate a password by randomly selecting characters from ALL_CHARACTERS
+        password = ''.join(secrets.choice(ALL_CHARACTERS) for _ in range(length))
+        # Check if the generated password is not in the list of common passwords
+        if password not in COMMON_PASSWORDS:
+            return password  # Return the generated password
+
+def password_strength(password):
+    # Calculate the length of the password
+    length = len(password)
+    # Check if the password contains uppercase letters
+    has_upper = any(char in UPPERCASE for char in password)
+    # Check if the password contains lowercase letters
+    has_lower = any(char in LOWERCASE for char in password)
+    # Check if the password contains digits
+    has_digit = any(char in DIGITS for char in password)
+    # Check if the password contains special characters
+    has_special = any(char in SPECIAL_CHARACTERS for char in password)
+
+    # List of strength criteria
+    strength_criteria = [has_upper, has_lower, has_digit, has_special]
+    # Sum the number of criteria met
+    strength = sum(strength_criteria)
+
+    # Determine the strength of the password based on criteria and length
+    if length >= 12 and strength == 4:
+        return "Strong"  # Password is strong if it meets all criteria and is at least 12 characters long
+    elif length >= 8 and strength >= 3:
+        return "Medium"  # Password is medium if it meets at least 3 criteria and is at least 8 characters long
+    else:
+        return "Weak"  # Password is weak if it doesn't meet the above criteria
+
+def main():
+    print("Welcome to my Password Generator")
+    try:
+        # Prompt user to enter the desired password length
+        length = int(input(f"Enter the desired password length (minimum {MIN_PASSWORD_LENGTH}): "))
+        # Check if the entered length is less than the minimum allowed length
+        if length < MIN_PASSWORD_LENGTH:
+            raise ValueError
+    except ValueError:
+        # Handle invalid input and use the default length
+        print(f"Invalid input. Using default length of {DEFAULT_PASSWORD_LENGTH}.")
+        length = DEFAULT_PASSWORD_LENGTH
+
+    # Generate a password with the specified or default length
+    password = generate_password(length)
+    # Evaluate the strength of the generated password
+    strength = password_strength(password)
+
+    # Display the generated password and its strength
+    print(f"Generated Password: {password}")
+    print(f"Password Strength: {strength}")
+
+if __name__ == "__main__":
+    main()  # Run the main function
